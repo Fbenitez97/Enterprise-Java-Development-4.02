@@ -3,6 +3,9 @@ package Controller;
 import Model.Employee;
 import Model.Patient;
 import Model.Status;
+import Service.EmployeeService;
+import Service.PatientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,30 +16,33 @@ import static Model.Status.*;
 
 @RestController
 public class PatientController {
-    private List<Patient> patientsRepo;
-   Employee employee = new Employee("45af", "magico", ON_CALL, "RANRAN");
 
-    public PatientController(){
-        patientsRepo = new ArrayList<>();
-
-        patientsRepo.add(new Patient("45af","Manolo", "29-09-1997", employee));
-        patientsRepo.add(new Patient("45af","paco", "06-12-1999", employee));
-    }
-
+    @Autowired
+    private PatientService patientService;
     @RequestMapping(value="/patients", method= RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public void addPatient (@RequestBody Patient patient) {
-        patientsRepo.add(patient);
+        patientService.addPatient(patient);
     }
 
     @RequestMapping(value="/patients/{id}", method= RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void setPatients (@RequestBody Patient patient,String id, String name, String dateOfBirth, Employee employee) {
-        patient.setId(id);
-        patient.setName(name);
-        patient.setDateOfBirth(dateOfBirth);
-        patient.setEmployee(employee);
+    public void setPatients (@PathVariable String id,@RequestBody String name,@RequestBody String dateOfBirth,@RequestBody Employee employee) {
+        patientService.setPatients(id, name, dateOfBirth, employee);
     }
+
+    @RequestMapping(value="/patients", method= RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public List<Patient> allPatients() {
+        return patientService.allPatients();
+    }
+
+    @RequestMapping(value="/patients/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public Patient readPatientId(@PathVariable String id) {
+        return patientService.readPatientId(id);
+    }
+
 
 
 }
